@@ -127,6 +127,13 @@ it as you wish.
 $ cp website/settings/local-dist.py website/settings/local.py
 ```
 
+- Install RabbitMQ and Celery
+These must be installed before the setup script
+```bash
+$ brew install rabbitmq
+$ pip install celery
+```
+
 - On MacOSX with [homebrew](http://brew.sh/), there is a script that should automate much of the install process:
 
 ```bash
@@ -153,6 +160,13 @@ Then create or edit either `~./bash_profile` or `/etc/profile` to include the fo
 `ulimit -n 2048`
 
 Then reboot.
+
+###### If running `invoke setup` shows python import issues, run the following:
+```bash
+$ pip uninstall uritemplate.py --yes
+$ pip install uritemplate.py==0.3.0
+```
+Then re-run `invoke setup`
 
 #### Additional things to install
 
