@@ -170,8 +170,9 @@ Then re-run `invoke setup`
 
 #### Additional things to install
 
-The automated installer does not install Waterbutler, which may be needed to run some OSF features locally. 
+- The automated installer does not install Waterbutler, which may be needed to run some OSF features locally. 
 Consult the [Waterbutler repository](https://github.com/CenterForOpenScience/waterbutler) for setup instructions.
+- In order to create a osf profile locally, run the [fakecas script](http://github.com/CenterForOpenScience/fakecas) in a seperate terminal
 
 ### Manual installation
 [At present](CONTRIBUTING.md), there is no complete automated install process for other platforms. 
