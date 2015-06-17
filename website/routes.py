@@ -65,6 +65,8 @@ def get_globals():
         'language': language,
         'web_url_for': util.web_url_for,
         'api_url_for': util.api_url_for,
+        'api_v2_url': util.api_v2_url,  # URL function for templates
+        'api_v2_base': util.api_v2_url(''),  # Base url used by JS api helper
         'sanitize': sanitize,
         'js_str': lambda x: x.replace("'", r"\'").replace('"', r'\"'),
         'webpack_asset': paths.webpack_asset,
@@ -425,17 +427,18 @@ def make_url_map(app):
         ),
 
         Rule(
-            '/resend/',
-            ['get', 'post'],
-            auth_views.resend_confirmation,
-            OsfWebRenderer('resend.mako', render_mako_string)
-        ),
-
-        Rule(
             '/resetpassword/<verification_key>/',
             ['get', 'post'],
             auth_views.reset_password,
             OsfWebRenderer('public/resetpassword.mako', render_mako_string)
+        ),
+
+        # Resend confirmation URL linked to in CAS login page
+        Rule(
+            '/resend/',
+            ['get', 'post'],
+            auth_views.resend_confirmation,
+            OsfWebRenderer('resend.mako', render_mako_string)
         ),
 
         # TODO: Remove `auth_register_post`
@@ -480,8 +483,6 @@ def make_url_map(app):
              OsfWebRenderer('profile.mako')),
         Rule('/settings/key_history/<kid>/', 'get', profile_views.user_key_history,
              OsfWebRenderer('profile/key_history.mako')),
-        Rule('/addons/', 'get', profile_views.profile_addons,
-             OsfWebRenderer('profile/addons.mako')),
         Rule(["/user/merge/"], 'get', auth_views.merge_user_get,
              OsfWebRenderer("merge_accounts.mako")),
         Rule(["/user/merge/"], 'post', auth_views.merge_user_post,
@@ -538,6 +539,7 @@ def make_url_map(app):
 
         Rule('/profile/', 'get', profile_views.profile_view, json_renderer),
         Rule('/profile/', 'put', profile_views.update_user, json_renderer),
+        Rule('/resend/', 'put', profile_views.resend_confirmation, json_renderer),
         Rule('/profile/<uid>/', 'get', profile_views.profile_view_id, json_renderer),
 
         # Used by profile.html
@@ -723,9 +725,6 @@ def make_url_map(app):
 
         # # TODO: Add API endpoint for tags
         # Rule('/tags/<tag>/', 'get', project_views.tag.project_tag, OsfWebRenderer('tags.mako')),
-
-        Rule('/folder/<nid>', 'get', project_views.node.folder_new,
-             OsfWebRenderer('project/new_folder.mako')),
         Rule('/api/v1/folder/<nid>', 'post', project_views.node.folder_new_post, json_renderer),
         Rule('/project/new/<pid>/beforeTemplate/', 'get',
              project_views.node.project_before_template, json_renderer),
@@ -1303,15 +1302,6 @@ def make_url_map(app):
             'put',
             addon_views.create_waterbutler_log,
             json_renderer,
-        ),
-        Rule(
-            [
-                '/project/<pid>/files/<provider>/<path:path>/',
-                '/project/<pid>/node/<nid>/files/<provider>/<path:path>/',
-            ],
-            'get',
-            addon_views.addon_render_file,
-            json_renderer
         ),
         Rule(
             '/settings/addons/',

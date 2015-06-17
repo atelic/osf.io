@@ -125,17 +125,6 @@ def project_new_from_template(auth, node, **kwargs):
 ##############################################################################
 # New Folder
 ##############################################################################
-
-
-@must_be_logged_in
-def folder_new(**kwargs):
-    node_id = kwargs['nid']
-    return_value = {}
-    if node_id is not None:
-        return_value = {'node_id': node_id}
-    return return_value
-
-
 @must_be_valid_project
 @must_be_logged_in
 def folder_new_post(auth, node, **kwargs):
@@ -883,7 +872,7 @@ def get_recent_logs(node, **kwargs):
     return {'logs': logs}
 
 
-def _get_summary(node, auth, rescale_ratio, primary=True, link_id=None):
+def _get_summary(node, auth, rescale_ratio, primary=True, link_id=None, show_path=False):
     # TODO(sloria): Refactor this or remove (lots of duplication with _view_project)
     summary = {
         'id': link_id if link_id else node._id,
@@ -913,7 +902,10 @@ def _get_summary(node, auth, rescale_ratio, primary=True, link_id=None):
             'ua': None,
             'non_ua': None,
             'addons_enabled': node.get_addon_names(),
-            'is_public': node.is_public
+            'is_public': node.is_public,
+            'parent_title': node.parent_node.title if node.parent_node else None,
+            'parent_is_public': node.parent_node.is_public if node.parent_node else False,
+            'show_path': show_path
         })
         if rescale_ratio:
             ua_count, ua, non_ua = _get_user_activity(node, auth, rescale_ratio)
@@ -943,9 +935,10 @@ def get_summary(auth, node, **kwargs):
             raise HTTPError(http.BAD_REQUEST)
     primary = kwargs.get('primary')
     link_id = kwargs.get('link_id')
+    show_path = kwargs.get('show_path', False)
 
     return _get_summary(
-        node, auth, rescale_ratio, primary=primary, link_id=link_id
+        node, auth, rescale_ratio, primary=primary, link_id=link_id, show_path=show_path
     )
 
 
